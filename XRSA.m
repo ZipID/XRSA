@@ -19,7 +19,7 @@
         policy = SecPolicyCreateBasicX509();
         OSStatus returnCode = SecTrustCreateWithCertificates(certificate, policy, &trust);
         if (returnCode != 0) {
-            NSLog(@"SecTrustCreateWithCertificates fail. Error Code: %ld", returnCode);
+            NSLog(@"SecTrustCreateWithCertificates fail. Error Code: %d", (int)returnCode);
             return nil;
         }
 
@@ -63,15 +63,15 @@
     [content getBytes:plain
                length:plainLen];
 
-    size_t cipherLen = 128; // currently RSA key length is set to 128 bytes
+    size_t cipherLen = SecKeyGetBlockSize(publicKey);
     void *cipher = malloc(cipherLen);
 
-    OSStatus returnCode = SecKeyEncrypt(publicKey, kSecPaddingPKCS1, plain,
+    OSStatus returnCode = SecKeyEncrypt(publicKey, kSecPaddingOAEP, plain,
                                         plainLen, cipher, &cipherLen);
 
     NSData *result = nil;
     if (returnCode != 0) {
-        NSLog(@"SecKeyEncrypt fail. Error Code: %ld", returnCode);
+        NSLog(@"SecKeyEncrypt fail. Error Code: %d", (int)returnCode);
     }
     else {
         result = [NSData dataWithBytes:cipher
@@ -91,6 +91,11 @@
 - (NSString *) encryptToString:(NSString *)content {
     NSData *data = [self encryptWithString:content];
     return [self base64forData:data];
+}
+
+- (NSString *) encryptToStringWithData:(NSData *)content {
+    NSData *data = [self encryptWithData:content];
+    return [self base64forData:data];    
 }
 
 // convert NSData to NSString

@@ -13,5 +13,7 @@
 - (NSData *) encryptWithData:(NSData *)content;
 - (NSData *) encryptWithString:(NSString *)content;
 - (NSString *) encryptToString:(NSString *)content;
+- (NSString *) encryptToStringWithData:(NSData *)content;
+- (NSString*)base64forData:(NSData*)theData;
 
 @end
